@@ -89,3 +89,39 @@ Pewarisan CarController extends ProductController menimbulkan kesan bahwa fitur 
 
 Tanpa DIP:
 Ketika CarController bergantung langsung pada CarServiceImpl, terjadi tight coupling terhadap implementasi tertentu. Jika ingin mengganti implementasi service, controller juga harus ikut diubah. Selain itu, proses unit testing menjadi lebih sulit karena tidak dapat dengan mudah melakukan mocking terhadap kelas konkret.
+
+---
+### TDD Reflection
+
+> 1. Reflect based on Percival (2017) proposed self-reflective questions (in "Principles and Best Practice of Testing" submodule, chapter "Evaluating Your Testing Objectives"), whether this TDD flow is useful enough for you or not. If not, explain things that you need to do next time you make more tests.
+
+Menurut saya, alur TDD yang saya gunakan cukup membantu selama proses pengembangan. Berdasarkan pertanyaan reflektif dari Percival (2017), saya merasa beberapa tujuan dari testing sudah tercapai.
+
+Pertama, test memberikan rasa percaya diri saat melakukan refactoring. Dengan adanya unit test seperti OrderServiceImplTest dan OrderRepositoryTest, saya tidak terlalu khawatir ketika melakukan perubahan pada kode. Jika ada perubahan yang menyebabkan perilaku program menjadi salah, test yang ada biasanya langsung gagal sehingga masalahnya bisa cepat terlihat.
+
+Kedua, test juga membantu menemukan bug lebih awal. Beberapa test yang dibuat mencakup kondisi tertentu seperti ketika order sudah ada sebelumnya (testCreateOrderIfAlreadyExists) atau ketika status yang diberikan tidak valid (testUpdateStatusInvalidStatus). Dengan adanya test untuk kondisi-kondisi ini, potensi error bisa terdeteksi sebelum kode digunakan lebih jauh.
+
+Selain itu, test juga cukup membantu sebagai dokumentasi perilaku sistem. Nama method test seperti testFindByIdIfIdFound dan testFindByIdIfIdNotFound sudah cukup jelas untuk menggambarkan apa yang seharusnya dilakukan oleh fungsi tersebut.
+
+Walaupun begitu, masih ada beberapa hal yang bisa diperbaiki ke depannya. Misalnya, saya perlu membuat test yang mencakup lebih banyak variasi kasus, terutama edge case yang mungkin belum terpikirkan. Selain itu, saya juga ingin lebih konsisten menerapkan strict TDD, yaitu menulis test terlebih dahulu sebelum menulis implementasi. Dengan cara ini, desain kode bisa lebih dipandu oleh kebutuhan dari test. Terakhir, akan lebih baik jika ditambahkan integration test agar bisa memastikan bahwa beberapa komponen dalam sistem dapat bekerja dengan baik ketika digabungkan.
+
+> 2. You have created unit tests in Tutorial. Now reflect whether your tests have successfully followed F.I.R.S.T. principle or not. If not, explain things that you need to do the next time you create more tests.
+
+Secara umum, unit test yang saya buat sudah cukup mengikuti prinsip F.I.R.S.T.
+
+Fast (Cepat)
+Test dapat dijalankan dengan cepat karena dependency seperti OrderRepository dimock menggunakan Mockito. Dengan begitu, test tidak perlu berinteraksi langsung dengan database atau operasi I/O lainnya yang biasanya lebih lambat.
+
+Independent / Isolated (Independen)
+Setiap test berjalan secara terpisah dan tidak bergantung pada hasil test lain. Penggunaan @BeforeEach membantu memastikan bahwa setiap test dimulai dari kondisi awal yang bersih, sehingga perubahan pada satu test tidak mempengaruhi test yang lain.
+
+Repeatable (Dapat Diulang)
+Test dapat dijalankan berkali-kali dengan hasil yang konsisten. Hal ini karena test tidak bergantung pada faktor eksternal seperti koneksi jaringan, database nyata, atau waktu sistem. Data yang digunakan juga selalu dibuat ulang melalui method setUp().
+
+Self-Validating (Memvalidasi Sendiri)
+Setiap test memiliki assertion yang jelas menggunakan fungsi seperti assertEquals, assertNull, assertTrue, dan assertThrows. Dengan begitu, hasil test langsung menunjukkan apakah test tersebut berhasil atau gagal tanpa perlu pengecekan manual.
+
+Timely (Tepat Waktu)
+Test dibuat mengikuti alur TDD, yaitu ditulis sebelum atau bersamaan dengan implementasi kode. Hal ini membantu memastikan bahwa kode yang dibuat memang memenuhi kebutuhan yang sudah didefinisikan melalui test.
+
+Secara keseluruhan, unit test yang saya buat sudah cukup sesuai dengan prinsip F.I.R.S.T. Namun, ke depannya saya ingin lebih konsisten dalam menerapkan pendekatan TDD secara ketat, yaitu benar-benar menulis test terlebih dahulu sebelum implementasi, serta memastikan bahwa setiap test tetap terisolasi dan tidak berbagi state dengan test lain.
