@@ -13,11 +13,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -140,5 +142,54 @@ class PaymentServiceImplTest {
         List<Payment> result = paymentService.getAllPayments();
 
         assertEquals(2, result.size());
+    }
+
+    @Test
+    void testAddPaymentUnsupportedMethodThrowsException() {
+        Map<String, String> paymentData = new HashMap<>();
+
+        assertThrows(IllegalArgumentException.class,
+                () -> paymentService.addPayment(order, "Bank Transfer", paymentData));
+    }
+
+    @Test
+    void testAddPaymentNullMethodThrowsException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> paymentService.addPayment(order, null, new HashMap<>()));
+    }
+
+    @Test
+    void testSetStatusUnknownStatusWillNotChangeOrderStatus() {
+        Map<String, String> paymentData = new HashMap<>();
+        paymentData.put("address", "Depok");
+        paymentData.put("deliveryFee", "10000");
+        doAnswer(invocation -> invocation.getArgument(0)).when(paymentRepository).save(any(Payment.class));
+
+        Payment payment = paymentService.addPayment(order, "Cash on Delivery", paymentData);
+        paymentService.setStatus(payment, "PENDING");
+
+        assertEquals(OrderStatus.WAITING_PAYMENT.getValue(), order.getStatus());
+    }
+
+    @Test
+    void testSetStatusForPaymentOutsideOrderMap() {
+        doAnswer(invocation -> invocation.getArgument(0)).when(paymentRepository).save(any(Payment.class));
+        Payment payment = new Payment("external-payment", "Cash on Delivery", "REJECTED", new HashMap<>());
+
+        Payment updatedPayment = paymentService.setStatus(payment, "SUCCESS");
+
+        assertEquals("SUCCESS", updatedPayment.getStatus());
+    }
+
+    @Test
+    void testAddPaymentWhenStrategyListIsEmpty() {
+        PaymentServiceImpl serviceWithEmptyStrategies = new PaymentServiceImpl(paymentRepository, Collections.emptyList());
+        Map<String, String> paymentData = new HashMap<>();
+        paymentData.put("voucherCode", "ESHOP1234ABC5678");
+        doAnswer(invocation -> invocation.getArgument(0)).when(paymentRepository).save(any(Payment.class));
+
+        Payment payment = serviceWithEmptyStrategies.addPayment(order, "Voucher Code", paymentData);
+
+        assertEquals("SUCCESS", payment.getStatus());
     }
 }

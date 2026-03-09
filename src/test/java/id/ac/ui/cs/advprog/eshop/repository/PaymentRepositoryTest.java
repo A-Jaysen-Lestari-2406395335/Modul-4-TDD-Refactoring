@@ -59,4 +59,15 @@ class PaymentRepositoryTest {
 
         assertEquals(2, payments.size());
     }
+
+    @Test
+    void testSaveCreatePaymentWhenAnotherPaymentAlreadyExists() {
+        paymentRepository.save(new Payment("payment-1", "Voucher Code", "SUCCESS", new HashMap<>()));
+        Payment payment2 = new Payment("payment-2", "Cash on Delivery", "REJECTED", new HashMap<>());
+
+        Payment result = paymentRepository.save(payment2);
+
+        assertEquals("payment-2", result.getId());
+        assertEquals("payment-2", paymentRepository.findById("payment-2").getId());
+    }
 }

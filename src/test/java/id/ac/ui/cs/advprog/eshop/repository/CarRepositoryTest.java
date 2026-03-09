@@ -86,6 +86,18 @@ class CarRepositoryTest {
     }
 
     @Test
+    void testFindByIdNotFoundWhenRepositoryHasData() {
+        Car car = new Car();
+        car.setCarId("car-1");
+        car.setCarName("ExistingCar");
+        carRepository.create(car);
+
+        Car result = carRepository.findById("another-id");
+
+        assertNull(result);
+    }
+
+    @Test
     void testUpdateFound() {
         Car car = new Car();
         car.setCarName("Original");
@@ -117,6 +129,22 @@ class CarRepositoryTest {
     }
 
     @Test
+    void testUpdateNotFoundWhenRepositoryHasData() {
+        Car existingCar = new Car();
+        existingCar.setCarId("car-2");
+        existingCar.setCarName("Existing");
+        carRepository.create(existingCar);
+
+        Car updatedCar = new Car();
+        updatedCar.setCarName("Updated");
+
+        Car result = carRepository.update("unknown-id", updatedCar);
+
+        assertNull(result);
+        assertEquals("Existing", carRepository.findById("car-2").getCarName());
+    }
+
+    @Test
     void testDelete() {
         Car car = new Car();
         car.setCarName("ToDelete");
@@ -126,5 +154,16 @@ class CarRepositoryTest {
         carRepository.delete(carId);
 
         assertNull(carRepository.findById(carId));
+    }
+
+    @Test
+    void testDeleteIfIdNotFoundShouldNotRemoveExistingCar() {
+        Car car = new Car();
+        car.setCarName("StillHere");
+        carRepository.create(car);
+
+        carRepository.delete("non-existent-id");
+
+        assertNotNull(carRepository.findById(car.getCarId()));
     }
 }
