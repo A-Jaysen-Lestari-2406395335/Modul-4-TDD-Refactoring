@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create New Order</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+<body>
+<div class="container">
+    <h3>Create New Order</h3>
+
+    <form th:action="@{/order/create}" method="post">
+        <div class="form-group">
+            <label for="orderIdInput">Order ID</label>
+            <input name="orderId" type="text" class="form-control mb-3 col-6" id="orderIdInput"
+                   placeholder="Enter order ID">
+        </div>
+        <div class="form-group">
+            <label for="authorInput">Author</label>
+            <input name="author" type="text" class="form-control mb-3 col-6" id="authorInput"
+                   placeholder="Enter author name">
+        </div>
+        <div class="form-group">
+            <label for="productNameInput">Product Name</label>
+            <input name="productName" type="text" class="form-control mb-3 col-6" id="productNameInput"
+                   placeholder="Enter product name">
+        </div>
+        <div class="form-group">
+            <label for="productQuantityInput">Product Quantity</label>
+            <input name="productQuantity" type="number" min="1" class="form-control mb-4 col-6" id="productQuantityInput"
+                   placeholder="Enter product quantity">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+</body>
+</html>
