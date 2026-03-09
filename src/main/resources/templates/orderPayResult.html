@@ -7,14 +7,20 @@
           integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 </head>
 <body>
-<div class="container">
+<div class="container my-3">
     <h3>Payment Result</h3>
-    <p>
-        Payment ID: <span th:text="${payment.id}"></span>
-    </p>
-    <p>
-        Status: <span th:text="${payment.status}"></span>
-    </p>
+    <div class="card col-6 p-3">
+        <p class="mb-2">
+            Payment ID: <span th:text="${payment.id}"></span>
+        </p>
+        <p class="mb-0">
+            Status: <span th:text="${payment.status}"></span>
+        </p>
+    </div>
+
+    <a th:href="@{/payment/detail/{paymentId}(paymentId=${payment.id})}" class="btn btn-primary btn-sm mt-3">
+        View Payment Detail
+    </a>
 </div>
 </body>
 </html>

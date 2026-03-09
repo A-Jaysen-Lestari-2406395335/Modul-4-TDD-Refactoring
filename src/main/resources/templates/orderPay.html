@@ -7,11 +7,12 @@
           integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 </head>
 <body>
-<div class="container">
+<div class="container my-3">
     <h3>Pay Order</h3>
-    <p th:if="${order != null}">
-        Order ID: <span th:text="${order.id}"></span>
-    </p>
+    <div th:if="${order != null}" class="mb-3">
+        <p class="mb-1">Order ID: <span th:text="${order.id}"></span></p>
+        <p class="mb-0">Order Author: <span th:text="${order.author}"></span></p>
+    </div>
 
     <form th:action="@{/order/pay/{orderId}(orderId=${order.id})}" method="post">
         <div class="form-group">
@@ -19,23 +20,28 @@
             <input id="methodInput" name="method" type="text" class="form-control mb-3 col-6"
                    placeholder="Voucher Code or Cash on Delivery">
         </div>
-        <div class="form-group">
+
+        <h5>Voucher Payment Data</h5>
+        <div class="form-group mb-4">
             <label for="voucherCodeInput">Voucher Code</label>
             <input id="voucherCodeInput" name="voucherCode" type="text" class="form-control mb-3 col-6"
-                   placeholder="Optional for voucher">
+                   placeholder="e.g. ESHOP1234ABC5678">
         </div>
+
+        <h5>Cash on Delivery Data</h5>
         <div class="form-group">
             <label for="addressInput">Address</label>
             <input id="addressInput" name="address" type="text" class="form-control mb-3 col-6"
-                   placeholder="Optional for COD">
+                   placeholder="Delivery address">
         </div>
         <div class="form-group">
             <label for="deliveryFeeInput">Delivery Fee</label>
             <input id="deliveryFeeInput" name="deliveryFee" type="text" class="form-control mb-4 col-6"
-                   placeholder="Optional for COD">
+                   placeholder="Delivery fee value">
         </div>
 
         <button id="payButton" type="submit" class="btn btn-primary">Pay</button>
+        <a th:href="@{/order/history}" class="btn btn-secondary">Back to History</a>
     </form>
 </div>
 </body>
