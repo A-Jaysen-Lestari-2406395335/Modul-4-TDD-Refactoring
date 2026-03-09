@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -21,6 +22,10 @@ public class PaymentServiceImpl implements PaymentService {
     private static final int VOUCHER_LENGTH = 16;
     private static final int VOUCHER_DIGIT_COUNT = 8;
     private static final String VOUCHER_PREFIX = "ESHOP";
+    private static final String PAYMENT_DATA_VOUCHER_CODE = "voucherCode";
+    private static final String PAYMENT_DATA_ADDRESS = "address";
+    private static final String PAYMENT_DATA_DELIVERY_FEE = "deliveryFee";
+    private static final Pattern NON_LETTER_PATTERN = Pattern.compile("[^A-Za-z]");
 
     @Autowired
     private PaymentRepository paymentRepository;
@@ -67,30 +72,30 @@ public class PaymentServiceImpl implements PaymentService {
 
     private String determineInitialStatus(String method, Map<String, String> paymentData) {
         String normalizedMethod = normalizeMethod(method);
-        if (METHOD_VOUCHER_CODE.equals(normalizedMethod)) {
-            return isVoucherValid(paymentData) ? STATUS_SUCCESS : STATUS_REJECTED;
+        switch (normalizedMethod) {
+            case METHOD_VOUCHER_CODE:
+                return isVoucherValid(paymentData) ? STATUS_SUCCESS : STATUS_REJECTED;
+            case METHOD_CASH_ON_DELIVERY:
+                return isCashOnDeliveryValid(paymentData) ? STATUS_SUCCESS : STATUS_REJECTED;
+            default:
+                throw new IllegalArgumentException();
         }
-        if (METHOD_CASH_ON_DELIVERY.equals(normalizedMethod)) {
-            return isCashOnDeliveryValid(paymentData) ? STATUS_SUCCESS : STATUS_REJECTED;
-        }
-
-        throw new IllegalArgumentException();
     }
 
     private String normalizeMethod(String method) {
         if (method == null) {
             throw new IllegalArgumentException();
         }
-        return method.replaceAll("[^A-Za-z]", "").toUpperCase();
+        return NON_LETTER_PATTERN.matcher(method).replaceAll("").toUpperCase();
     }
 
     private boolean isVoucherValid(Map<String, String> paymentData) {
-        if (paymentData == null) {
+        String voucherCode = getPaymentDataValue(paymentData, PAYMENT_DATA_VOUCHER_CODE);
+        if (voucherCode == null) {
             return false;
         }
 
-        String voucherCode = paymentData.get("voucherCode");
-        if (voucherCode == null || voucherCode.length() != VOUCHER_LENGTH || !voucherCode.startsWith(VOUCHER_PREFIX)) {
+        if (!hasValidVoucherFormat(voucherCode)) {
             return false;
         }
 
@@ -98,11 +103,20 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private boolean isCashOnDeliveryValid(Map<String, String> paymentData) {
-        if (paymentData == null) {
-            return false;
-        }
+        String address = getPaymentDataValue(paymentData, PAYMENT_DATA_ADDRESS);
+        String deliveryFee = getPaymentDataValue(paymentData, PAYMENT_DATA_DELIVERY_FEE);
+        return isNotBlank(address) && isNotBlank(deliveryFee);
+    }
 
-        return isNotBlank(paymentData.get("address")) && isNotBlank(paymentData.get("deliveryFee"));
+    private boolean hasValidVoucherFormat(String voucherCode) {
+        return voucherCode.length() == VOUCHER_LENGTH && voucherCode.startsWith(VOUCHER_PREFIX);
+    }
+
+    private String getPaymentDataValue(Map<String, String> paymentData, String key) {
+        if (paymentData == null) {
+            return null;
+        }
+        return paymentData.get(key);
     }
 
     private int countDigits(String value) {
