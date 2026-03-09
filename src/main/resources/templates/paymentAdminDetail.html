@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Admin Detail</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+<body>
+<div class="container my-2">
+    <h3>Payment Admin Detail</h3>
+
+    <div th:if="${payment != null}">
+        <p>Payment ID: <span th:text="${payment.id}"></span></p>
+        <p>Status: <span th:text="${payment.status}"></span></p>
+
+        <form th:action="@{/payment/admin/set-status/{paymentId}(paymentId=${payment.id})}" method="post">
+            <div class="form-group">
+                <label for="statusInput">Status</label>
+                <input id="statusInput" name="status" type="text" class="form-control mb-3 col-4" placeholder="SUCCESS or REJECTED">
+            </div>
+            <button id="setStatusButton" type="submit" class="btn btn-primary btn-sm">Set Status</button>
+        </form>
+    </div>
+
+    <div th:if="${payment == null}">
+        <p>Payment not found: <span th:text="${paymentId}"></span></p>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Detail</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+<body>
+<div class="container my-2">
+    <h3>Payment Detail</h3>
+
+    <div th:if="${payment != null}">
+        <p>Payment ID: <span th:text="${payment.id}"></span></p>
+        <p>Method: <span th:text="${payment.method}"></span></p>
+        <p>Status: <span th:text="${payment.status}"></span></p>
+    </div>
+
+    <div th:if="${payment == null and paymentId != null}">
+        <p>Payment not found: <span th:text="${paymentId}"></span></p>
+    </div>
+
+    <a th:href="@{/payment/admin/list}" class="btn btn-primary btn-sm">Go to Payment Admin List</a>
+</div>
+</body>
+</html>
